@@ -18,6 +18,10 @@ import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
 
 class CutsceneImpl(private val plugin: Plugin, private val player: Player, private val location: Location, private val modelId: String, private val animation: String) : Cutscene {
+    companion object {
+        private val MODIFIER = TrackerModifier.builder().sightTrace(false).damageAnimation(false).damageTint(false).shadow(false).build()
+    }
+
     private val entity = location.world.spawn(location, ArmorStand::class.java).apply {
         setAI(false)
         setGravity(false)
@@ -26,19 +30,9 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
 
     private val model = BetterModel.model(modelId)
         .map { r ->
-            r.create(entity, TrackerModifier.DEFAULT) { tracker ->
+            r.create(entity, MODIFIER) { tracker ->
                 tracker.update(TrackerUpdateAction.brightness(15, 15))
-                tracker.animate(animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) {
-                    tracker.close()
-
-                    cameraEntity.detachPlayer()
-                    cameraEntity.remove()
-                    Bukkit.getScheduler().runTask(plugin) { task ->
-                        entity.remove()
-                    }
-
-                    tickTask.cancel()
-                }
+                tracker.animate(animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) { close() }
                 tracker.markPlayerForSpawn(player)
             }
         }
@@ -56,10 +50,6 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         cameraEntity.attachPlayer()
     }, 50L, 50L, TimeUnit.MILLISECONDS)
 
-    init {
-        player.lookAt(Position.fine(location), LookAnchor.FEET)
-    }
-
     fun cameraLocation(): Location = location.clone().apply {
         val position = camera.hitBoxPosition()
         val rotation = camera.worldRotation()
@@ -67,6 +57,18 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         add(position.x.toDouble(), position.y.toDouble(), position.z.toDouble())
         yaw -= rotation.y
         pitch = rotation.x
+    }
+
+    override fun close() {
+        tracker.close()
+
+        cameraEntity.detachPlayer()
+        cameraEntity.remove()
+        Bukkit.getScheduler().runTask(plugin) { task ->
+            entity.remove()
+        }
+
+        tickTask.cancel()
     }
 
     override fun getLocation(): Location = location

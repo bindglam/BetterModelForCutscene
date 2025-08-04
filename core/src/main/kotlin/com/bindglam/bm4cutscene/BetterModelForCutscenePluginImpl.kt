@@ -1,19 +1,16 @@
 package com.bindglam.bm4cutscene
 
-import com.bindglam.bm4cutscene.cutscene.CutsceneImpl
-import dev.jorel.commandapi.CommandAPI
-import dev.jorel.commandapi.CommandAPIBukkitConfig
-import dev.jorel.commandapi.CommandAPICommand
-import dev.jorel.commandapi.CommandPermission
-import dev.jorel.commandapi.arguments.LocationArgument
-import dev.jorel.commandapi.arguments.PlayerArgument
-import dev.jorel.commandapi.arguments.StringArgument
-import dev.jorel.commandapi.executors.CommandExecutor
+import com.bindglam.bm4cutscene.manager.*
+import dev.jorel.commandapi.*
+import dev.jorel.commandapi.arguments.*
+import dev.jorel.commandapi.executors.*
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
 class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlugin {
+    private val cutsceneManager = CutsceneManagerImpl(this)
+
     override fun onLoad() {
         CommandAPI.onLoad(CommandAPIBukkitConfig(this))
 
@@ -29,7 +26,14 @@ class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlu
                         val id = args["id"] as String
                         val animation = args["animation"] as String
 
-                        CutsceneImpl(this, player, location, id, animation)
+                        cutsceneManager.playCutscene(player, location, id, animation)
+                    }),
+                CommandAPICommand("stop")
+                    .withArguments(PlayerArgument("player"))
+                    .executes(CommandExecutor { sender, args ->
+                        val player = args["player"] as Player
+
+                        cutsceneManager.stopCutscene(player)
                     })
             )
             .register()
@@ -44,4 +48,6 @@ class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlu
     override fun onDisable() {
         CommandAPI.onDisable()
     }
+
+    override fun getCutsceneManager(): CutsceneManager = cutsceneManager
 }

@@ -11,7 +11,6 @@ import net.minecraft.world.entity.Display
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.PositionMoveRotation
-import net.minecraft.world.entity.Relative
 import org.bukkit.Location
 import org.bukkit.craftbukkit.CraftWorld
 import org.bukkit.craftbukkit.entity.CraftPlayer
@@ -80,13 +79,8 @@ class CameraEntityImpl(private val player: Player, private var location: Locatio
         ))
     }
 
-    override fun getId(): Int {
-        return display.id
-    }
-
-    override fun getLocation(): Location {
-        return location
-    }
+    override fun getId(): Int = display.id
+    override fun getLocation(): Location = location
 
     override fun setLocation(location: Location) {
         this.location = location

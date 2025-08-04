@@ -6,6 +6,8 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 public interface Cutscene {
+    void close();
+
     @NotNull Location getLocation();
 
     @NotNull EntityTracker getTracker();
