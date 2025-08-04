@@ -1,18 +1,17 @@
 package com.bindglam.bm4cutscene.cutscene
 
 import com.bindglam.bm4cutscene.nms.CameraEntityImpl
-import io.papermc.paper.entity.LookAnchor
-import io.papermc.paper.math.Position
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import kr.toxicity.model.api.BetterModel
 import kr.toxicity.model.api.animation.AnimationModifier
 import kr.toxicity.model.api.bone.RenderedBone
-import kr.toxicity.model.api.tracker.EntityTracker
+import kr.toxicity.model.api.tracker.Tracker
 import kr.toxicity.model.api.tracker.TrackerModifier
 import kr.toxicity.model.api.tracker.TrackerUpdateAction
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import org.bukkit.GameMode
 import org.bukkit.Location
-import org.bukkit.entity.ArmorStand
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
@@ -22,33 +21,47 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         private val MODIFIER = TrackerModifier.builder().sightTrace(false).damageAnimation(false).damageTint(false).shadow(false).build()
     }
 
-    private val entity = location.world.spawn(location, ArmorStand::class.java).apply {
-        setAI(false)
-        setGravity(false)
-        isSmall = true
-    }
+    private val lastGameMode = player.gameMode
+    private val lastLocation = player.location
 
     private val model = BetterModel.model(modelId)
         .map { r ->
-            r.create(entity, MODIFIER) { tracker ->
+            r.create(location, MODIFIER) { tracker ->
                 tracker.update(TrackerUpdateAction.brightness(15, 15))
-                tracker.animate(animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) { close() }
-                tracker.markPlayerForSpawn(player)
+                tracker.animate(animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) {
+                    if(!shiftToClose)
+                        close()
+                }
+                tracker.spawn(player)
             }
         }
         .get()
-
     private val camera = model.bone("camera")!!
-
     private val cameraEntity: CameraEntity = CameraEntityImpl(player, cameraLocation()).apply { spawn() }
 
-    val tickTask: ScheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, { task ->
-        cameraEntity.moveDuration(camera.interpolationDuration())
-        cameraEntity.location = cameraLocation()
-        cameraEntity.update()
+    private val tickTask: ScheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, { task ->
+        if(model.isRunningSingleAnimation) {
+            cameraEntity.moveDuration(camera.interpolationDuration())
+            cameraEntity.location = cameraLocation()
+            cameraEntity.update()
 
-        cameraEntity.attachPlayer()
+            cameraEntity.attachPlayer()
+        }
+
+        if(!model.isRunningSingleAnimation && shiftToClose) {
+            player.sendActionBar(Component.keybind("key.sneak").append(Component.text("로 나가기")))
+
+            if(player.isSneaking)
+                close()
+        }
     }, 50L, 50L, TimeUnit.MILLISECONDS)
+
+    private var shiftToClose = true
+
+    init {
+        player.gameMode = GameMode.SPECTATOR
+        player.teleportAsync(location)
+    }
 
     fun cameraLocation(): Location = location.clone().apply {
         val position = camera.hitBoxPosition()
@@ -59,20 +72,26 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         pitch = rotation.x
     }
 
+    override fun shiftToClose(shiftToClose: Boolean) {
+        this.shiftToClose = shiftToClose
+    }
+
     override fun close() {
-        tracker.close()
+        model.close()
+
+        Bukkit.getScheduler().runTask(plugin) { task ->
+            player.gameMode = lastGameMode
+        }
+        player.teleportAsync(lastLocation)
 
         cameraEntity.detachPlayer()
         cameraEntity.remove()
-        Bukkit.getScheduler().runTask(plugin) { task ->
-            entity.remove()
-        }
 
         tickTask.cancel()
     }
 
     override fun getLocation(): Location = location
-    override fun getTracker(): EntityTracker = model
+    override fun getTracker(): Tracker = model
     override fun getCamera(): RenderedBone = camera
     override fun getCameraEntity(): CameraEntity = cameraEntity
 }
