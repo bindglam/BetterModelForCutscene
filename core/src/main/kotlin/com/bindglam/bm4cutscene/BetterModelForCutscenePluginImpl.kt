@@ -19,14 +19,18 @@ class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlu
             .withPermission(CommandPermission.OP)
             .withSubcommands(
                 CommandAPICommand("play")
-                    .withArguments(PlayerArgument("player"), LocationArgument("location"), StringArgument("id"), StringArgument("animation"))
+                    .withArguments(PlayerArgument("player"), LocationArgument("location"), StringArgument("id"), StringArgument("animation"),
+                        BooleanArgument("shiftToClose").setOptional(true))
                     .executes(CommandExecutor { sender, args ->
                         val player = args["player"] as Player
                         val location = args["location"] as Location
                         val id = args["id"] as String
                         val animation = args["animation"] as String
 
-                        cutsceneManager.playCutscene(player, location, id, animation)
+                        cutsceneManager.playCutscene(player, location, id, animation).apply {
+                            if(args.get("shiftToClose") != null)
+                                shiftToClose(args["shiftToClose"] as Boolean)
+                        }
                     }),
                 CommandAPICommand("stop")
                     .withArguments(PlayerArgument("player"))
