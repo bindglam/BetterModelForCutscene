@@ -16,7 +16,7 @@ import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
 
-class CutsceneImpl(private val plugin: Plugin, private val player: Player, private val location: Location, private val modelId: String, private val animation: String) : Cutscene {
+class CutsceneImpl(private val plugin: Plugin, private val player: Player, private val location: Location, private val properties: CutsceneProperties) : Cutscene {
     companion object {
         private val MODIFIER = TrackerModifier.builder().sightTrace(false).damageAnimation(false).damageTint(false).shadow(false).build()
     }
@@ -24,12 +24,12 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
     private val lastGameMode = player.gameMode
     private val lastLocation = player.location
 
-    private val model = BetterModel.model(modelId)
+    private val model = BetterModel.model(properties.modelId)
         .map { r ->
             r.create(location, MODIFIER) { tracker ->
                 tracker.update(TrackerUpdateAction.brightness(15, 15))
-                tracker.animate(animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) {
-                    if(!shiftToClose)
+                tracker.animate(properties.animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) {
+                    if(!properties.shiftToClose)
                         close()
                 }
                 tracker.spawn(player)
@@ -48,15 +48,13 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
             cameraEntity.attachPlayer()
         }
 
-        if(!model.isRunningSingleAnimation && shiftToClose) {
+        if(!model.isRunningSingleAnimation && properties.shiftToClose) {
             player.sendActionBar(Component.keybind("key.sneak").append(Component.text("로 나가기")))
 
             if(player.isSneaking)
                 close()
         }
     }, 50L, 50L, TimeUnit.MILLISECONDS)
-
-    private var shiftToClose = true
 
     init {
         player.gameMode = GameMode.SPECTATOR
@@ -70,10 +68,6 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         add(position.x.toDouble(), position.y.toDouble(), position.z.toDouble())
         yaw -= rotation.y
         pitch = rotation.x
-    }
-
-    override fun shiftToClose(shiftToClose: Boolean) {
-        this.shiftToClose = shiftToClose
     }
 
     override fun close() {

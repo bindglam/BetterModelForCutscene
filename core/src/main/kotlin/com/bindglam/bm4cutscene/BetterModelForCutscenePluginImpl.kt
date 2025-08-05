@@ -1,5 +1,6 @@
 package com.bindglam.bm4cutscene
 
+import com.bindglam.bm4cutscene.cutscene.CutsceneProperties
 import com.bindglam.bm4cutscene.manager.*
 import dev.jorel.commandapi.*
 import dev.jorel.commandapi.arguments.*
@@ -27,10 +28,11 @@ class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlu
                         val id = args["id"] as String
                         val animation = args["animation"] as String
 
-                        cutsceneManager.playCutscene(player, location, id, animation).apply {
-                            if(args.get("shiftToClose") != null)
-                                shiftToClose(args["shiftToClose"] as Boolean)
-                        }
+                        val propertiesBuilder = CutsceneProperties.builder().model(id).animation(animation)
+                        if(args.get("shiftToClose") != null)
+                            propertiesBuilder.shiftToClose(args["shiftToClose"] as Boolean)
+
+                        cutsceneManager.playCutscene(player, location, propertiesBuilder.build())
                     }),
                 CommandAPICommand("stop")
                     .withArguments(PlayerArgument("player"))

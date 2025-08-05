@@ -6,8 +6,6 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
 public interface Cutscene {
-    void shiftToClose(boolean shiftToClose);
-
     void close();
 
     @NotNull Location getLocation();
