@@ -12,7 +12,7 @@
 
 ### 📥 설치 방법
 1. Paper 서버가 준비되어 있는지 확인합니다.
-2. **BM4Cutscene**의 최신 버전 ```.jar``` 파일을 [릴리즈 페이지 링크]에서 다운로드합니다.
+2. **BM4Cutscene**의 최신 버전 ```.jar``` 파일을 [릴리즈 페이지](https://github.com/bindglam/BetterModelForCutscene/releases)에서 다운로드합니다.
 3. 다운로드한 파일을 서버의 ```plugins``` 폴더에 업로드합니다.
 4. 서버를 재시작하여 플러그인을 활성화합니다.
 
