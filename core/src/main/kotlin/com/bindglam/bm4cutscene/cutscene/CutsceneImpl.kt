@@ -10,7 +10,6 @@ import kr.toxicity.model.api.tracker.TrackerModifier
 import kr.toxicity.model.api.tracker.TrackerUpdateAction
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -21,7 +20,6 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         private val MODIFIER = TrackerModifier.builder().sightTrace(false).damageAnimation(false).damageTint(false).shadow(false).build()
     }
 
-    private val lastGameMode = player.gameMode
     private val lastLocation = player.location
 
     private val model = BetterModel.model(properties.modelId)
@@ -57,7 +55,6 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
     }, 50L, 50L, TimeUnit.MILLISECONDS)
 
     init {
-        player.gameMode = GameMode.SPECTATOR
         player.teleportAsync(location)
     }
 
@@ -73,9 +70,6 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
     override fun close() {
         model.close()
 
-        Bukkit.getScheduler().runTask(plugin) { task ->
-            player.gameMode = lastGameMode
-        }
         player.teleportAsync(lastLocation)
 
         cameraEntity.detachPlayer()
