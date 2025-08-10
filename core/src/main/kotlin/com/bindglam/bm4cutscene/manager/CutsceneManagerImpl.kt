@@ -7,9 +7,10 @@ import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 class CutsceneManagerImpl(private val plugin: Plugin) : CutsceneManager {
-    private val cutsceneMap = hashMapOf<UUID, Cutscene>()
+    private val cutsceneMap = ConcurrentHashMap<UUID, Cutscene>()
 
     override fun playCutscene(player: Player, location: Location, properties: CutsceneProperties): Cutscene {
         stopCutscene(player)
