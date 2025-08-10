@@ -7,6 +7,9 @@
 - **가벼운 코드**: 핵심 기능만 탑재하여 서버의 부하 없이 가볍게 사용 가능합니다.
 - **유연한 API**: BetterModel API를 사용하고 있기에 언제든지 원하는 기능을 추가할 수 있습니다.
 
+### 🔗 의존성
+- [BetterModel](https://modrinth.com/plugin/bettermodel)
+
 ### 📥 설치 방법
 1. Paper 서버가 준비되어 있는지 확인합니다.
 2. **BM4Cutscene**의 최신 버전 ```.jar``` 파일을 [릴리즈 페이지 링크]에서 다운로드합니다.
