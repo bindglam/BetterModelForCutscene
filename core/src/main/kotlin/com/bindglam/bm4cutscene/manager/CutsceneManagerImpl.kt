@@ -12,20 +12,14 @@ class CutsceneManagerImpl(private val plugin: Plugin) : CutsceneManager {
     private val cutsceneMap = hashMapOf<UUID, Cutscene>()
 
     override fun playCutscene(player: Player, location: Location, properties: CutsceneProperties): Cutscene {
-        val cutscene = CutsceneImpl(plugin, player, location, properties)
-        cutsceneMap[player.uniqueId] = cutscene
-        return cutscene
+        stopCutscene(player)
+
+        return CutsceneImpl(plugin, player, location, properties).also { cutsceneMap[player.uniqueId] = it }
     }
 
     override fun stopCutscene(player: Player) {
-        if(!cutsceneMap.contains(player.uniqueId))
-            return
-
-        cutsceneMap[player.uniqueId]!!.close()
-        cutsceneMap.remove(player.uniqueId)
+        cutsceneMap.remove(player.uniqueId)?.close()
     }
 
-    override fun getCutscene(player: Player): Cutscene? {
-        return cutsceneMap[player.uniqueId]
-    }
+    override fun getCutscene(player: Player): Cutscene? = cutsceneMap[player.uniqueId]
 }
