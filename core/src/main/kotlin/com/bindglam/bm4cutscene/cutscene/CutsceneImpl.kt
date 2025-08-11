@@ -66,15 +66,6 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         player.teleportAsync(location)
     }
 
-    fun cameraLocation(): Location = location.clone().apply {
-        val position = camera.hitBoxPosition()
-        val rotation = camera.worldRotation()
-
-        add(position.x.toDouble(), position.y.toDouble(), position.z.toDouble())
-        yaw -= rotation.y
-        pitch = rotation.x
-    }
-
     override fun close() {
         model.close()
 
@@ -84,6 +75,15 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
         cameraEntity.remove()
 
         tickTask.cancel()
+    }
+
+    private fun cameraLocation(): Location = location.clone().apply {
+        val position = camera.hitBoxPosition()
+        val rotation = camera.worldRotation()
+
+        add(position.x.toDouble(), position.y.toDouble(), position.z.toDouble())
+        yaw -= rotation.y
+        pitch = rotation.x
     }
 
     override fun getLocation(): Location = location
