@@ -2,14 +2,13 @@ package com.bindglam.bm4cutscene.cutscene
 
 import com.bindglam.bm4cutscene.nms.CameraEntity
 import com.bindglam.bm4cutscene.nms.CameraEntityImpl
+import com.bindglam.bm4cutscene.utils.*
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import kr.toxicity.model.api.BetterModel
-import kr.toxicity.model.api.animation.AnimationIterator
 import kr.toxicity.model.api.animation.AnimationModifier
 import kr.toxicity.model.api.bone.RenderedBone
 import kr.toxicity.model.api.tracker.DummyTracker
 import kr.toxicity.model.api.tracker.Tracker
-import kr.toxicity.model.api.tracker.TrackerModifier
 import kr.toxicity.model.api.tracker.TrackerUpdateAction
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -36,15 +35,8 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
     private val camera: RenderedBone = model.bone("camera")!!
     private val cameraEntity: CameraEntity = CameraEntityImpl(player, cameraLocation()).apply { spawn() }
 
-    private val isRunningAnimation: Boolean
-        get() {
-            val runningAnimation = model.pipeline.runningAnimation()
-
-            return runningAnimation != null && runningAnimation.type == AnimationIterator.Type.PLAY_ONCE
-        }
-
     private val tickTask: ScheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, { task ->
-        val isRunning = isRunningAnimation
+        val isRunning = model.isRunningAnimation
 
         if(isRunning) {
             cameraEntity.moveDuration(camera.interpolationDuration())
