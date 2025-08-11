@@ -1,5 +1,6 @@
 package com.bindglam.bm4cutscene.cutscene
 
+import com.bindglam.bm4cutscene.nms.CameraEntity
 import com.bindglam.bm4cutscene.nms.CameraEntityImpl
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import kr.toxicity.model.api.BetterModel

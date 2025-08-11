@@ -1,8 +1,11 @@
 package com.bindglam.bm4cutscene
 
 import com.bindglam.bm4cutscene.cutscene.CutsceneProperties
+import com.bindglam.bm4cutscene.listeners.PlayerJoinQuitListener
 import com.bindglam.bm4cutscene.manager.CutsceneManager
 import com.bindglam.bm4cutscene.manager.CutsceneManagerImpl
+import com.bindglam.bm4cutscene.manager.PlayerNetworkManager
+import com.bindglam.bm4cutscene.manager.PlayerNetworkManagerImpl
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
 import dev.jorel.commandapi.CommandAPICommand
@@ -18,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlugin {
     private val cutsceneManager = CutsceneManagerImpl(this)
+    private val playerNetworkManager = PlayerNetworkManagerImpl()
 
     override fun onLoad() {
         CommandAPI.onLoad(CommandAPIBukkitConfig(this))
@@ -56,6 +60,8 @@ class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlu
         CommandAPI.onEnable()
 
         BetterModelForCutscene.setInstance(this)
+
+        server.pluginManager.registerEvents(PlayerJoinQuitListener(), this)
     }
 
     override fun onDisable() {
@@ -63,4 +69,5 @@ class BetterModelForCutscenePluginImpl : JavaPlugin(), BetterModelForCutscenePlu
     }
 
     override fun getCutsceneManager(): CutsceneManager = cutsceneManager
+    override fun getPlayerNetworkManager(): PlayerNetworkManager = playerNetworkManager
 }

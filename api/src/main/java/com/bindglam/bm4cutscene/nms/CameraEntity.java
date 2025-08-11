@@ -1,4 +1,4 @@
-package com.bindglam.bm4cutscene.cutscene;
+package com.bindglam.bm4cutscene.nms;
 
 import org.bukkit.Location;
 

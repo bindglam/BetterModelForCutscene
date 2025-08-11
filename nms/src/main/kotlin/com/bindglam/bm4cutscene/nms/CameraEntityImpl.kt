@@ -1,6 +1,5 @@
 package com.bindglam.bm4cutscene.nms
 
-import com.bindglam.bm4cutscene.cutscene.CameraEntity
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundSetCameraPacket
 import net.minecraft.world.entity.Display
