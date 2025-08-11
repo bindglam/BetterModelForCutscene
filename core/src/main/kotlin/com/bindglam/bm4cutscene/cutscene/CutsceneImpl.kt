@@ -6,6 +6,7 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask
 import kr.toxicity.model.api.BetterModel
 import kr.toxicity.model.api.animation.AnimationModifier
 import kr.toxicity.model.api.bone.RenderedBone
+import kr.toxicity.model.api.tracker.DummyTracker
 import kr.toxicity.model.api.tracker.Tracker
 import kr.toxicity.model.api.tracker.TrackerModifier
 import kr.toxicity.model.api.tracker.TrackerUpdateAction
@@ -23,7 +24,7 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
 
     private val lastLocation = player.location
 
-    private val model = BetterModel.model(properties.modelId)
+    private val model: DummyTracker = BetterModel.model(properties.modelId)
         .map { r ->
             r.create(location, MODIFIER) { tracker ->
                 tracker.update(TrackerUpdateAction.brightness(15, 15))
@@ -35,7 +36,7 @@ class CutsceneImpl(private val plugin: Plugin, private val player: Player, priva
             }
         }
         .get()
-    private val camera = model.bone("camera")!!
+    private val camera: RenderedBone = model.bone("camera")!!
     private val cameraEntity: CameraEntity = CameraEntityImpl(player, cameraLocation()).apply { spawn() }
 
     private val tickTask: ScheduledTask = Bukkit.getAsyncScheduler().runAtFixedRate(plugin, { task ->
