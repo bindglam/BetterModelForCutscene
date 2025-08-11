@@ -8,7 +8,6 @@ plugins {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    compileOnly("io.github.toxicity188:BetterModel:1.10.3")
     implementation("dev.jorel:commandapi-bukkit-shade-mojang-mapped:10.1.2")
     implementation(project(":api"))
     implementation(project(":nms"))

@@ -15,7 +15,7 @@ tasks {
         minecraftVersion("1.21.4")
 
         downloadPlugins {
-            modrinth("bettermodel", "1.10.3")
+            modrinth("bettermodel", "1.11.0")
         }
     }
 

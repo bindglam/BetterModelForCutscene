@@ -15,6 +15,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("io.github.toxicity188:BetterModel:1.11.0")
 }
 
 tasks {
