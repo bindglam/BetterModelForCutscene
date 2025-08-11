@@ -18,15 +18,11 @@ import org.bukkit.plugin.Plugin
 import java.util.concurrent.TimeUnit
 
 class CutsceneImpl(private val plugin: Plugin, private val player: Player, private val location: Location, private val properties: CutsceneProperties) : Cutscene {
-    companion object {
-        private val MODIFIER = TrackerModifier.builder().sightTrace(false).damageAnimation(false).damageTint(false).shadow(false).build()
-    }
-
     private val lastLocation = player.location
 
     private val model: DummyTracker = BetterModel.model(properties.modelId)
         .map { r ->
-            r.create(location, MODIFIER) { tracker ->
+            r.create(location, properties.modifier()) { tracker ->
                 tracker.update(TrackerUpdateAction.brightness(15, 15))
                 tracker.animate(properties.animation, AnimationModifier.DEFAULT_WITH_PLAY_ONCE) {
                     if(!properties.shiftToClose)
